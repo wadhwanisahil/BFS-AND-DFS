@@ -3,13 +3,13 @@ import java.util.*;
 public class weightedgraph {
     static class Edge {
         int source;
-        int deti;
-        int wei;
+        int dest;
+        int weight;
 
         public Edge(int s, int d, int w) {
-            this.wei = w;
+            this.weight = w;
             this.source = s;
-            this.deti = d;
+            this.dest = d;
         }
     }
 
@@ -39,7 +39,7 @@ public class weightedgraph {
                 visited[curr] = true;
             }
             for (Edge e : graph[curr]) {
-                q.add(e.deti);
+                q.add(e.dest);
             }
         }
     }
@@ -47,33 +47,41 @@ public class weightedgraph {
     public static void dfs(ArrayList<Edge>[] graph, int curr, boolean visited[]) {
         System.out.println(curr);
         visited[curr] = true;
-        for (int i = 0; i < graph[curr].size(); i++) {
-            Edge e = graph[curr].get(i);
-            if (visited[e.deti] == false) {
-                dfs(graph, e.deti, visited);
+        for (Edge e : graph[curr]) {
+            if (!visited[e.dest]) {
+                dfs(graph, e.dest, visited);
             }
-
         }
+    }
+
+    public static void printAllPaths(ArrayList<Edge>[] graph, boolean vis[], int curr, String path, int tar) {
+        if (curr == tar) {
+            System.out.println(path + tar);
+            return;
+        }
+        vis[curr] = true;
+        for (Edge e : graph[curr]) {
+            if (!vis[e.dest]) {
+                printAllPaths(graph, vis, e.dest, path + curr + " -> ", tar);
+            }
+        }
+        vis[curr] = false;
     }
 
     public static void main(String[] args) {
         int v = 4;
-        ArrayList<Edge>[] graph = new ArrayList[v];
-        boolean vis[] = new boolean[v];
+        ArrayList<Edge>[] graph = (ArrayList<Edge>[]) new ArrayList[v];
 
-        createGraph(graph, v); // Call createGraph method to initialize the graph
-
-        // Access and print elements of graph[2]
-        if (graph[2] != null) {
-            for (int i = 0; i < graph[2].size(); i++) {
-                Edge e = graph[2].get(i);
-                System.out.println(e.deti + " " + e.wei);
-            }
-        } else {
-            System.out.println("graph[2] is null");
+        for (int i = 0; i < v; i++) {
+            graph[i] = new ArrayList<>();
         }
 
+        createGraph(graph, v);
+
+        int src = 0;
+        int tar = 3;
+        printAllPaths(graph, new boolean[v], src, "", tar);
         bfs(graph, v);
-        dfs(graph, 0, vis);
+        dfs(graph, src, new boolean[v]);
     }
 }
